@@ -1,0 +1,15 @@
+package com.github.bingoohuang.utils.codec;
+
+import java.security.MessageDigest;
+
+public class Md5 {
+    public static String md5(String info) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] digest = md.digest(Bytes.bytes(info));
+            return Base64.base64(digest, Base64.Format.Purified);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
