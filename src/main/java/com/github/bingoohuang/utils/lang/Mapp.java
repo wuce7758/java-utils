@@ -5,6 +5,9 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.alibaba.fastjson.JSON.parseObject;
+import static com.alibaba.fastjson.JSON.toJSONString;
+
 public class Mapp {
     public static <K, V> Map<K, V> of(K k1, V v1) {
         Map<K, V> map = newHashMap();
@@ -112,6 +115,10 @@ public class Mapp {
         Number value = getNum(m, key);
         if (value == null) return null;
         return value instanceof Long ? (Long) value : new Long(value.longValue());
+    }
+
+    public static <K, V> Map<K, V> desc(Object obj) {
+        return parseObject(toJSONString(obj), Map.class);
     }
 
 }

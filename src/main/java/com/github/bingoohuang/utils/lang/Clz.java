@@ -3,6 +3,8 @@ package com.github.bingoohuang.utils.lang;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 public class Clz {
@@ -59,6 +61,48 @@ public class Clz {
      */
     public static ClassLoader getClassLoader() {
         return Thread.currentThread().getContextClassLoader();
+    }
+
+    /**
+     * Get method.
+     * @param class1 class
+     * @param methodName method name
+     * @return method
+     */
+    public static Method getMethod(Class<? extends Object> class1, String methodName) {
+        try {
+            return class1.getMethod(methodName);
+        }
+        catch (SecurityException e) {
+            throw new RuntimeException(e);
+        }
+        catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 安静的调用对象的方法。
+     * @param target 对象
+     * @param m 方法
+     * @return 方法返回
+     */
+    public static Object invokeQuietly(Object target, Method m) {
+        try {
+            return m.invoke(target);
+        }
+        catch (IllegalArgumentException e) {
+        }
+        catch (IllegalAccessException e) {
+        }
+        catch (InvocationTargetException e) {
+            e.printStackTrace();
+            if (e.getTargetException() instanceof RuntimeException) {
+                throw (RuntimeException) e.getTargetException();
+            }
+        }
+
+        return null;
     }
 
 }
