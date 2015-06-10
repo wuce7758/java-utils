@@ -17,4 +17,29 @@ public class Str {
 
         return sb;
     }
+
+    // return true if 'left' and 'right' are matching parens/brackets/braces
+    public static boolean matches(char left, char right) {
+        if (left == '(') return right == ')';
+        if (left == '[') return right == ']';
+        if (left == '{') return right == '}';
+        return false;
+    }
+
+    public static String substrInQuotes(String str, char left, int pos) {
+        int leftTimes = 0;
+        int leftPos = str.indexOf(left, pos);
+        if (leftPos < 0) return "";
+
+        for (int i = leftPos + 1; i < str.length(); ++i) {
+            char charAt = str.charAt(i);
+            if (charAt == left) ++leftTimes;
+            else if (matches(left, charAt)) {
+                if (leftTimes == 0) return str.substring(leftPos + 1, i);
+                --leftTimes;
+            }
+        }
+
+        return "";
+    }
 }
