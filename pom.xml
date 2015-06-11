@@ -8,7 +8,7 @@
     </parent>
     <groupId>com.github.bingoohuang</groupId>
     <artifactId>java-utils</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.0.3</version>
     <packaging>jar</packaging>
 
     <name>java utilities</name>
@@ -190,7 +190,6 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <failOnError>false</failOnError>
                     <skip>false</skip>
                     <show>public</show>
                     <charset>UTF-8</charset>
