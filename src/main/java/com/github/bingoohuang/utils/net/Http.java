@@ -19,6 +19,19 @@ public class Http {
         }
     }
 
+    public static void respondText(HttpServletResponse rsp, String text) {
+        try {
+            rsp.setHeader("Content-Type", "text/plain; charset=UTF-8");
+            rsp.setCharacterEncoding("UTF-8");
+            PrintWriter writer = rsp.getWriter();
+            writer.write(text);
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static boolean isAjax(HttpServletRequest request) {
         return "XMLHttpRequest".equals(request.getHeader("X-Requested-With"));
     }

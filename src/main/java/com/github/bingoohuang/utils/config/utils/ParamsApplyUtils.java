@@ -18,12 +18,9 @@ public class ParamsApplyUtils {
             .compile("\\w+([.$]\\w+)*\\s*(\\(\\s*[.\\w]+\\s*(,\\s*[.\\w]+\\s*)*\\))?");
     private static Logger log = LoggerFactory.getLogger(ParamsApplyUtils.class);
 
-    /**
+    /*
      * 根据形如com.ailk.xxx.yyy(a123,b23)的字符串，生成对象。
      * 如果该对象实现ExtraInfoSetter接口，则将括弧中的额外信息设置到对象中。
-     *
-     * @param propertyValue String
-     * @return List<Object>
      */
     @SuppressWarnings("unchecked")
     public static <T> List<T> createObjects(String propertyValue, Class<? super T> cls) {
