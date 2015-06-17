@@ -36,6 +36,26 @@ public class Redis {
         }
     }
 
+    public boolean tryLock(final String key) {
+        boolean tryLock = setnx(key, "tryLock");
+        if (tryLock) expire(key, 10, TimeUnit.SECONDS);
+        return tryLock;
+    }
+
+    public boolean isLocked(final String key) {
+        String s = get(key);
+        return s != null;
+    }
+
+    public boolean setnx(final String key, final String value) {
+        Jedis jedis = pool.getResource();
+        try {
+            return jedis.setnx(key, value) == 1;
+        } finally {
+            jedis.close();
+        }
+    }
+
     public Long ttl(final String key) {
         Jedis jedis = pool.getResource();
         try {
