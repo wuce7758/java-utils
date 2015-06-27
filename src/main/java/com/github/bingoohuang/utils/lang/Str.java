@@ -1,5 +1,7 @@
 package com.github.bingoohuang.utils.lang;
 
+import java.io.File;
+
 public class Str {
     public static StringBuilder padding(String s, char letter, int repeats) {
         StringBuilder sb = new StringBuilder(s);
@@ -41,5 +43,12 @@ public class Str {
         }
 
         return "";
+    }
+
+    public static String addLastSlash(String path) {
+        if (path == null || path.isEmpty()) return path;
+
+        return path.charAt(path.length() - 1) != File.separatorChar
+                ? (path + File.separator) : path;
     }
 }
