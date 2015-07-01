@@ -57,7 +57,7 @@ public class ClzPath {
     }
 
     public static InputStream toInputStream(String resClasspath) {
-        InputStream res = ClzPath.class.getResourceAsStream(resClasspath);
+        InputStream res = ClzPath.class.getClassLoader().getResourceAsStream(resClasspath);
         if (res == null) throw new RuntimeException(resClasspath + " does not exist");
 
         return res;
