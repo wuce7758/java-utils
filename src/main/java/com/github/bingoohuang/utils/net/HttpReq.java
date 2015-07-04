@@ -2,14 +2,12 @@ package com.github.bingoohuang.utils.net;
 
 import com.github.bingoohuang.utils.codec.Json;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
@@ -21,6 +19,8 @@ public class HttpReq {
     private StringBuilder params = new StringBuilder();
     Logger logger = LoggerFactory.getLogger(HttpReq.class);
     private List<Pair<String, String>> props = Lists.newArrayList();
+    private String body;
+    private String hashSymbol;
 
     public HttpReq(String baseUrl) {
         this.baseUrl = baseUrl;
@@ -35,6 +35,15 @@ public class HttpReq {
         return this;
     }
 
+    public HttpReq body(String body) {
+        this.body = body;
+        return this;
+    }
+
+    public HttpReq hashSymbol(String hashSymbol) {
+        this.hashSymbol = hashSymbol;
+        return this;
+    }
 
     public HttpReq cookie(String value) {
         if (value == null) return this;
@@ -106,7 +115,8 @@ public class HttpReq {
         HttpURLConnection http = null;
         try {
             String url = baseUrl + (req == null ? "" : req)
-                    + (params.length() > 0 ? ("?" + params) : "");
+                    + (params.length() > 0 ? ("?" + params) : "")
+                    + (hashSymbol == null ? "" : "#" + hashSymbol);
 
             http = commonSettings(url);
             setHeaders(http);
@@ -136,15 +146,23 @@ public class HttpReq {
     }
 
     private void writePostRequestBody(HttpURLConnection http) throws IOException {
-        if (params.length() == 0) return;
+        if (params.length() == 0 && StringUtils.isEmpty(body)) return;
 
-        DataOutputStream out = new DataOutputStream(http.getOutputStream());
-        // The URL-encoded contend 正文，正文内容其实跟get的URL中 '? '后的参数字符串一致
-        // DataOutputStream.writeBytes将字符串中的16位的unicode字符以8位的字符形式写到流里面
-        String postData = params.toString();
-        out.writeBytes(postData);
-        out.flush();
-        out.close();
+        if (StringUtils.isNotEmpty(body)) {
+            OutputStreamWriter out = new OutputStreamWriter(
+                    http.getOutputStream(), "UTF-8"); // utf-8编码
+            out.append(body);
+            out.flush();
+            out.close();
+        } else {
+            DataOutputStream out = new DataOutputStream(http.getOutputStream());
+            // The URL-encoded contend 正文，正文内容其实跟get的URL中 '? '后的参数字符串一致
+            // DataOutputStream.writeBytes将字符串中的16位的unicode字符以8位的字符形式写到流里面
+            String postData = params.toString();
+            out.writeBytes(postData);
+            out.flush();
+            out.close();
+        }
     }
 
     private String parseResponse(HttpURLConnection http, String url) throws IOException {
