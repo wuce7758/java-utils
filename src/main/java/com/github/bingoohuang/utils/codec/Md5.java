@@ -7,7 +7,7 @@ public class Md5 {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] digest = md.digest(Bytes.bytes(info));
-            return Base64.base64(digest, Base64.Format.Purified);
+            return Base64.base64(digest, Base64.Format.Standard);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -18,7 +18,28 @@ public class Md5 {
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(Bytes.bytes(salt));
             byte[] digest = md.digest(Bytes.bytes(info));
-            return Base64.base64(digest, Base64.Format.Purified);
+            return Base64.base64(digest, Base64.Format.Standard);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String md5Hex(String info) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] digest = md.digest(Bytes.bytes(info));
+            return Hex.hex(digest);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String md5Hex(String info, String salt) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(Bytes.bytes(salt));
+            byte[] digest = md.digest(Bytes.bytes(info));
+            return Hex.hex(digest);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

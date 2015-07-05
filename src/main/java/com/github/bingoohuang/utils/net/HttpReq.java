@@ -20,7 +20,7 @@ public class HttpReq {
     Logger logger = LoggerFactory.getLogger(HttpReq.class);
     private List<Pair<String, String>> props = Lists.newArrayList();
     private String body;
-    private String hashSymbol;
+    private String anchor;
 
     public HttpReq(String baseUrl) {
         this.baseUrl = baseUrl;
@@ -40,8 +40,8 @@ public class HttpReq {
         return this;
     }
 
-    public HttpReq hashSymbol(String hashSymbol) {
-        this.hashSymbol = hashSymbol;
+    public HttpReq anchor(String anchor) {
+        this.anchor = anchor;
         return this;
     }
 
@@ -75,8 +75,9 @@ public class HttpReq {
     public String post() {
         HttpURLConnection http = null;
         try {
-            // Post请求的url，与get不同的是不需要带参数
-            String url = baseUrl + (req == null ? "" : req);
+            String url = baseUrl + (req == null ? "" : req)
+                    + (params.length() > 0 && body != null? ("?" + params) : "")
+                    + (anchor == null ? "" : "#" + anchor);
 
             http = commonSettings(url);
             setHeaders(http);
@@ -116,7 +117,7 @@ public class HttpReq {
         try {
             String url = baseUrl + (req == null ? "" : req)
                     + (params.length() > 0 ? ("?" + params) : "")
-                    + (hashSymbol == null ? "" : "#" + hashSymbol);
+                    + (anchor == null ? "" : "#" + anchor);
 
             http = commonSettings(url);
             setHeaders(http);
@@ -149,8 +150,7 @@ public class HttpReq {
         if (params.length() == 0 && StringUtils.isEmpty(body)) return;
 
         if (StringUtils.isNotEmpty(body)) {
-            OutputStreamWriter out = new OutputStreamWriter(
-                    http.getOutputStream(), "UTF-8"); // utf-8编码
+            OutputStreamWriter out = new OutputStreamWriter(http.getOutputStream(), "UTF-8");
             out.append(body);
             out.flush();
             out.close();
