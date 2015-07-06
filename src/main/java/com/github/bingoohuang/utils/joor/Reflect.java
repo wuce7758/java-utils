@@ -1,38 +1,3 @@
-/**
- * Copyright (c) 2011-2012, Lukas Eder, lukas.eder@gmail.com
- * All rights reserved.
- *
- * This software is licensed to you under the Apache License, Version 2.0
- * (the "License"); You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * . Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- *
- * . Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
- *
- * . Neither the name "jOOR" nor the names of its contributors may be
- *   used to endorse or promote products derived from this software without
- *   specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
 package com.github.bingoohuang.utils.joor;
 
 import java.lang.reflect.Constructor;
@@ -43,7 +8,6 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 
 public class Reflect {
 
@@ -59,15 +23,9 @@ public class Reflect {
         return new Reflect(object);
     }
 
-
     private final Object object;
 
-
     private final boolean isClass;
-
-    // ---------------------------------------------------------------------
-    // Constructors
-    // ---------------------------------------------------------------------
 
     private Reflect(Class<?> type) {
         this.object = type;
@@ -78,11 +36,6 @@ public class Reflect {
         this.object = object;
         this.isClass = false;
     }
-
-    // ---------------------------------------------------------------------
-    // Fluent Reflection API
-    // ---------------------------------------------------------------------
-
 
     public <T> T get() {
         return (T) object;
@@ -150,7 +103,6 @@ public class Reflect {
     public <T> T get(String name) throws ReflectException {
         return field(name).<T> get();
     }
-
 
     public <T> T get(Field field) throws ReflectException {
         boolean accessible = true;
@@ -274,10 +226,6 @@ public class Reflect {
         return (P) Proxy.newProxyInstance(proxyType.getClassLoader(), new Class[] { proxyType }, handler);
     }
 
-    // ---------------------------------------------------------------------
-    // Object API
-    // ---------------------------------------------------------------------
-
     private boolean match(Class<?>[] declaredTypes, Class<?>[] actualTypes) {
         if (declaredTypes.length == actualTypes.length) {
             for (int i = 0; i < actualTypes.length; i++) {
@@ -291,17 +239,11 @@ public class Reflect {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return object.hashCode();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Reflect) { return object.equals(((Reflect) obj).get()); }
@@ -309,17 +251,10 @@ public class Reflect {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return object.toString();
     }
-
-    // ---------------------------------------------------------------------
-    // Utility methods
-    // ---------------------------------------------------------------------
 
     private static Reflect on(Constructor<?> constructor, Object... args) throws ReflectException {
         try {

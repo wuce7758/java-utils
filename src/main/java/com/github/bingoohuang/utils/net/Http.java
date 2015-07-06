@@ -1,23 +1,74 @@
 package com.github.bingoohuang.utils.net;
 
+import com.github.bingoohuang.utils.lang.Closer;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Http {
     public static void respondJSON(HttpServletResponse rsp, String json) {
-        if (json == null) return;
+        responseContent(rsp, json, "application/json", "UTF-8");
+    }
+    public static void responseText(HttpServletResponse rsp, String text) {
+        responseContent(rsp, text, "text/plain", "UTF-8");
+    }
+
+    public static void responseContent(HttpServletResponse rsp, String content,
+                                       String contentType, String characterEncoding) {
+        if (content == null) return;
 
         try {
-            rsp.setHeader("Content-Type", "application/json; charset=UTF-8");
-            rsp.setCharacterEncoding("UTF-8");
+            rsp.setHeader("Content-Type", contentType + "; charset=" + characterEncoding);
+            rsp.setCharacterEncoding(characterEncoding);
             PrintWriter writer = rsp.getWriter();
-            writer.write(json);
+            writer.write(content);
             writer.flush();
             writer.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public static Map<String, String> dealReqParams(Map<String, String[]> requestParams) {
+        Map<String, String> params = new HashMap();
+        try {
+            for (String key : requestParams.keySet()) {
+                String[] values = requestParams.get(key);
+
+                String valueStr = "";
+                for (int i = 0; i < values.length; i++) {
+                    valueStr = (i == values.length - 1) ? valueStr + values[i] : valueStr + values[i] + ",";
+                }
+                valueStr = new String(valueStr.getBytes("ISO-8859-1"), "gbk");
+                params.put(key, valueStr);
+            }
+            return params;
+        } catch (Exception e) {
+            throw new RuntimeException("参数处理出错", e);
+        }
+    }
+
+    public static String dealRequestBody(HttpServletRequest req, String charsetName) {
+        DataInputStream dis = null;
+        try {
+            int formDataLength = req.getContentLength();
+            dis = new DataInputStream(req.getInputStream());
+            byte buff[] = new byte[formDataLength];
+            int totalBytes = 0;
+            while (totalBytes < formDataLength) {
+                int bytes = dis.read(buff, totalBytes, formDataLength);
+                totalBytes += bytes;
+            }
+            return new String(buff, charsetName);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            Closer.closeQuietly(dis);
         }
     }
 
@@ -25,30 +76,16 @@ public class Http {
         return "XMLHttpRequest".equals(request.getHeader("X-Requested-With"));
     }
 
-    public static void respondText(HttpServletResponse rsp, String text) {
-        if (text == null) return;
-
-        try {
-            rsp.setHeader("Content-Type", "text/plain; charset=UTF-8");
-            rsp.setCharacterEncoding("UTF-8");
-            PrintWriter writer = rsp.getWriter();
-            writer.write(text);
-            writer.flush();
-            writer.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     public static void error(HttpServletResponse response, int statusCode, Throwable ex) {
         response.setStatus(statusCode);
         String message = ex.getMessage();
-        respondText(response, message != null ? message : ex.toString());
+        responseText(response, message != null ? message : ex.toString());
     }
 
 
     public static void error(HttpServletResponse response, int statusCode, String message) {
         response.setStatus(statusCode);
-        respondText(response, message);
+        responseText(response, message);
     }
 }
