@@ -46,7 +46,9 @@ public class Xmls {
             XMLStreamWriter prettyPrintWriter = (XMLStreamWriter) Proxy.newProxyInstance(
                     XMLStreamWriter.class.getClassLoader(), new Class[]{XMLStreamWriter.class}, handler);
             marshaller.marshal(bean, prettyPrintWriter);
-            return sw.toString();
+            String xml = sw.toString();
+            xml = xml.replaceAll(" xmlns:xsi=\"http://www\\.w3\\.org/2001/XMLSchema-instance\" xsi:nil=\"true\"", "");
+            return xml;
         } catch (Exception e) {
             throw Throwables.propagate(e);
         }

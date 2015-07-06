@@ -4,12 +4,13 @@ import javax.xml.bind.annotation.*;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(propOrder = {"brand", "description", "tag"})
+//@XmlType(propOrder = {"brand", "description", "tag"})
 public class Car {
+    private String brand;
     @XmlAttribute
     private String registration;
-    private String brand;
     private String description;
+    @XmlElement(nillable = true)
     private String tag;
 
     public Car() {

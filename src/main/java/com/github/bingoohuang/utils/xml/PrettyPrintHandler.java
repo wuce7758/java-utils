@@ -38,22 +38,15 @@ public class PrettyPrintHandler implements InvocationHandler {
         if ("writeCharacters".equals(methodName) && args[0] instanceof String) {
             String text = (String) args[0];
             boolean useCData = XML_CHARS.matcher(text).find();
-            if (useCData) {
-                target.writeCData(text);
-            } else {
-                target.writeCharacters(text);
-            }
+            if (useCData) target.writeCData(text);
+            else target.writeCharacters(text);
             return null;
-        }
-
-        if (!prettyFormat) {
-            return method.invoke(target, args);
         }
 
         // Needs to be BEFORE the actual event, so that for instance the
         // sequence writeStartElem, writeAttr, writeStartElem, writeEndElem, writeEndElem
         // is correctly handled
-        if ("writeStartElement".equals(methodName)) {
+        if ("writeStartElement".equals(methodName) && prettyFormat) {
             // update state of parent node
             if (depth > 0) hasChildElement.put(depth - 1, true);
             // reset state of current node
@@ -62,18 +55,12 @@ public class PrettyPrintHandler implements InvocationHandler {
             if (depth > 0 || withXmlDeclaration) target.writeCharacters(LINEFEED_CHAR);
             target.writeCharacters(repeat(INDENT_CHAR, depth));
             depth++;
-        } else if ("writeEndElement".equals(methodName)) {
+        } else if ("writeEndElement".equals(methodName) && prettyFormat) {
             depth--;
             if (hasChildElement.get(depth) == true) {
                 target.writeCharacters(LINEFEED_CHAR);
                 target.writeCharacters(repeat(INDENT_CHAR, depth));
             }
-        } else if ("writeEmptyElement".equals(methodName)) {
-            // update state of parent node
-            if (depth > 0) hasChildElement.put(depth - 1, true);
-            // indent for current depth
-            target.writeCharacters(LINEFEED_CHAR);
-            target.writeCharacters(repeat(INDENT_CHAR, depth));
         }
 
         return method.invoke(target, args);

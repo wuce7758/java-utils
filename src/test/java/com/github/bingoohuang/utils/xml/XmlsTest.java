@@ -17,7 +17,7 @@ public class XmlsTest {
 
         Car car = new Car(registration, brand, description);
         String xml = Xmls.marshal(car);
-        assertThat(xml, is(equalTo("<car registration=\"abc123\"><brand>沃尔沃</brand><description><![CDATA[Sedan<xx.yy@gmail.com>]]></description></car>")));
+        assertThat(xml, is(equalTo("<car registration=\"abc123\"><brand>沃尔沃</brand><description><![CDATA[Sedan<xx.yy@gmail.com>]]></description><tag></tag></car>")));
         System.out.println(xml);
         xml = Xmls.marshal(car, PrettyFormat);
         System.out.println(xml);
