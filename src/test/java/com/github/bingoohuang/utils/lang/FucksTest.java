@@ -10,7 +10,7 @@ public class FucksTest {
         try {
             throw new SQLException();
         } catch (SQLException ex) {
-            Fucks.fuck(ex);
+            throw Fucks.fuck(ex);
         }
     }
 }

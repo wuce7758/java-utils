@@ -7,7 +7,10 @@ public class Fucks {
         }
     }
 
-    public static void fuck(Throwable t) {
+    static RuntimeException ex = new RuntimeException();
+
+    public static RuntimeException fuck(Throwable t) {
         new FuckException<RuntimeException>().pleaseThrow(t);
+        return ex;
     }
 }
