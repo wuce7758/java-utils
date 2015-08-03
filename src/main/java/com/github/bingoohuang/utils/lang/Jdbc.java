@@ -32,7 +32,7 @@ public class Jdbc {
         password = jdbcProps.getProperty("password");
     }
 
-    private static Connection getConn() {
+    public static Connection getConn() {
         if (StringUtils.isEmpty(url))
             throw new RuntimeException("Jdbc is not properly configured!");
 
