@@ -1,12 +1,15 @@
 package com.github.bingoohuang.utils.lang;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import static com.alibaba.fastjson.JSON.parseObject;
-import static com.alibaba.fastjson.JSON.toJSONString;
+import static com.github.bingoohuang.utils.codec.Json.json;
+import static com.github.bingoohuang.utils.codec.Json.unJson;
 
 public class Mapp {
     public static <K, V> Map<K, V> of(K k1, V v1) {
@@ -118,7 +121,23 @@ public class Mapp {
     }
 
     public static <K, V> Map<K, V> desc(Object obj) {
-        return parseObject(toJSONString(obj), Map.class);
+        return unJson(json(obj), Map.class);
+    }
+
+    public static <T> T spec(Map map, Class<T> clz) {
+        return unJson(json(map), clz);
+    }
+
+    public static Map mapFromList(List<Map> list, String keyKey, String valueKey) {
+        if (list == null) return newHashMap();
+
+        Map result = newHashMap();
+        for (Map map : list) {
+            if (!map.containsKey(keyKey) || StringUtils.isEmpty(getStr(map, keyKey)) ||
+                    !map.containsKey(valueKey) || StringUtils.isEmpty(getStr(map, valueKey))) continue;
+            result.put(map.get(keyKey), map.get(valueKey));
+        }
+        return result;
     }
 
 }

@@ -1,5 +1,6 @@
 package com.github.bingoohuang.utils.crypto;
 
+import com.github.bingoohuang.utils.codec.Base64;
 import com.github.bingoohuang.utils.codec.Base64.Format;
 import com.github.bingoohuang.utils.lang.Closer;
 
@@ -8,6 +9,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.Key;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -19,17 +21,17 @@ import java.security.spec.X509EncodedKeySpec;
 
 import static com.github.bingoohuang.utils.codec.Base64.base64;
 import static com.github.bingoohuang.utils.codec.Base64.unBase64;
+import static com.github.bingoohuang.utils.codec.Bytes.bytes;
 
 public class RSA {
     public static final String KEY_ALGORITHMS = "RSA";
     public static final String SIGN_ALGORITHMS = "SHA1WithRSA";
 
-    public static String sign(String plainText, String privateKey, String plainTextCharset) {
+    public static String sign(String plainText, String privateKey) {
         try {
             Signature signature = Signature.getInstance(SIGN_ALGORITHMS);
             signature.initSign(generatePrivateKey(privateKey));
-            signature.update(plainText.getBytes(plainTextCharset));
-
+            signature.update(bytes(plainText));
             return base64(signature.sign(), Format.Standard);
 
         } catch (Exception e) {
@@ -37,13 +39,13 @@ public class RSA {
         }
     }
 
-    public static boolean verify(String plainText, String sign, String publicKey, String plainTextCharset) {
+    public static boolean verify(String plainText, String sign, String publicKey) {
         try {
             Signature signature = Signature.getInstance(SIGN_ALGORITHMS);
             signature.initVerify(generatePublicKey(publicKey));
-            signature.update(plainText.getBytes(plainTextCharset));
-
+            signature.update(bytes(plainText));
             return signature.verify(unBase64(sign));
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -96,5 +98,9 @@ public class RSA {
             throws NoSuchAlgorithmException, InvalidKeySpecException {
         return KeyFactory.getInstance(KEY_ALGORITHMS).generatePublic(
                 new X509EncodedKeySpec(unBase64(publicKey)));
+    }
+
+    public static String parseKeyAsBase64String(Key key) {
+        return Base64.base64(key.getEncoded(), Format.Standard);
     }
 }

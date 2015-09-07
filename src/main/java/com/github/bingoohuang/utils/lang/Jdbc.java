@@ -14,7 +14,7 @@ public class Jdbc {
     static {
         try {
             //load a properties file from class path, inside static method
-            InputStream is = Jdbc.class.getClassLoader().getResourceAsStream("jdbc.properties");
+            InputStream is = ClzPath.toInputStream("jdbc.properties");
 
             if (is != null) {
                 Properties jdbcProps = new Properties();

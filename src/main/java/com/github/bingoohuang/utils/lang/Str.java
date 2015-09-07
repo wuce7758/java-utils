@@ -45,6 +45,10 @@ public class Str {
         return "";
     }
 
+    public static String toStr(Object obj) {
+        return obj == null ? "" : obj.toString();
+    }
+
     public static String addLastSlash(String path) {
         if (path == null || path.isEmpty()) return path;
 

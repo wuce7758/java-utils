@@ -1,6 +1,5 @@
 package com.github.bingoohuang.utils.config.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.github.bingoohuang.utils.config.Configable;
 import com.github.bingoohuang.utils.config.ex.ConfigNotFoundException;
 import com.github.bingoohuang.utils.config.ex.ConfigValueFormatException;
@@ -12,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.github.bingoohuang.utils.codec.Json.unJson;
+import static com.github.bingoohuang.utils.codec.Json.unJsonArray;
 
 public abstract class BaseConfigable implements Configable {
     private static Pattern numberPattern = Pattern
@@ -188,7 +190,7 @@ public abstract class BaseConfigable implements Configable {
 
         T bean = null;
         try {
-            bean = JSON.parseObject(json, beanClass);
+            bean = unJson(json, beanClass);
         }
         catch (Exception ex) {
             throw new ConfigValueFormatException(key + "'s value is not in JSONObject format");
@@ -210,9 +212,9 @@ public abstract class BaseConfigable implements Configable {
 
         try {
             if (json.startsWith("["))
-                beans = JSON.parseArray(json, beanClass);
+                beans = unJsonArray(json, beanClass);
             else
-                beans.add(JSON.parseObject(json, beanClass));
+                beans.add(unJson(json, beanClass));
         }
         catch (Exception ex) {
             throw new ConfigValueFormatException(key + "'s value is not in JSONArray format");

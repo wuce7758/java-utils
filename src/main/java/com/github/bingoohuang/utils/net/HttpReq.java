@@ -7,6 +7,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
@@ -19,8 +22,11 @@ public class HttpReq {
     private StringBuilder params = new StringBuilder();
     Logger logger = LoggerFactory.getLogger(HttpReq.class);
     private List<Pair<String, String>> props = Lists.newArrayList();
+    private SSLSocketFactory sslSocketFactory;
+    private HostnameVerifier hostnameVerifier;
     private String body;
     private String anchor;
+
 
     public HttpReq(String baseUrl) {
         this.baseUrl = baseUrl;
@@ -72,6 +78,16 @@ public class HttpReq {
         return this;
     }
 
+    public HttpReq sslSocketFactory(SSLSocketFactory sslSocketFactory) {
+        this.sslSocketFactory = sslSocketFactory;
+        return this;
+    }
+
+    public HttpReq hostnameVerifier(HostnameVerifier hostnameVerifier) {
+        this.hostnameVerifier = hostnameVerifier;
+        return this;
+    }
+
     public String post() {
         HttpURLConnection http = null;
         try {
@@ -82,6 +98,11 @@ public class HttpReq {
             http = commonSettings(url);
             setHeaders(http);
             postSettings(http);
+            if (sslSocketFactory != null)
+                ((HttpsURLConnection) http).setSSLSocketFactory(sslSocketFactory);
+
+            if (hostnameVerifier != null)
+                ((HttpsURLConnection) http).setHostnameVerifier(hostnameVerifier);
 
             // 连接，从postUrl.openConnection()至此的配置必须要在connect之前完成，
             // 要注意的是connection.getOutputStream会隐含的进行connect。
@@ -121,6 +142,13 @@ public class HttpReq {
 
             http = commonSettings(url);
             setHeaders(http);
+
+            if (sslSocketFactory != null)
+                ((HttpsURLConnection) http).setSSLSocketFactory(sslSocketFactory);
+
+            if (hostnameVerifier != null)
+                ((HttpsURLConnection) http).setHostnameVerifier(hostnameVerifier);
+
             http.connect();
 
             return parseResponse(http, url);
