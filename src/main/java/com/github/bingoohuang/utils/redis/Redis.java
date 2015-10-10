@@ -27,7 +27,7 @@ public class Redis {
         pool.destroy();
     }
 
-    public Object op(RedisOp redisOp) {
+    public <T> T op(RedisOp<T> redisOp) {
         Jedis jedis = pool.getResource();
         try {
             return redisOp.exec(jedis);
@@ -51,6 +51,15 @@ public class Redis {
         Jedis jedis = pool.getResource();
         try {
             return jedis.setnx(key, value) == 1;
+        } finally {
+            jedis.close();
+        }
+    }
+
+    public boolean exists(final String key) {
+        Jedis jedis = pool.getResource();
+        try {
+            return jedis.exists(key);
         } finally {
             jedis.close();
         }
