@@ -1,12 +1,10 @@
 package com.github.bingoohuang.utils.redis;
 
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
-import redis.clients.jedis.Transaction;
+import redis.clients.jedis.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class Redis {
@@ -161,6 +159,65 @@ public class Redis {
             jedis.close();
         }
     }
+
+    public Long zadd(String key, double score, String member) {
+        Jedis jedis = pool.getResource();
+        try {
+            return jedis.zadd(key, score, member);
+        } finally {
+            jedis.close();
+        }
+    }
+
+    public Double zscore(String key, String member) {
+        Jedis jedis = pool.getResource();
+        try {
+            return jedis.zscore(key, member);
+        } finally {
+            jedis.close();
+        }
+    }
+
+    public void topn(String key, double score, String member, int topn) {
+        Jedis jedis = pool.getResource();
+        try {
+            jedis.zadd(key, score, member);
+            jedis.zremrangeByRank(key, 0, -topn - 1);
+        } finally {
+            jedis.close();
+        }
+    }
+
+    public Set<Tuple> topn(String key) {
+        Jedis jedis = pool.getResource();
+        try {
+            return jedis.zrevrangeWithScores(key, 0, -1);
+        } finally {
+            jedis.close();
+        }
+    }
+
+    public Long zadd(String key, Map<String, Double> scoreMembers) {
+        Jedis jedis = pool.getResource();
+        try {
+            return jedis.zadd(key, scoreMembers);
+        } finally {
+            jedis.close();
+        }
+    }
+
+    /*
+    Delete all except the top 5, zremrangebyrank myzset 0 -6
+     */
+    public Long zremrangeByRank(String key, long start, long stop) {
+        Jedis jedis = pool.getResource();
+        try {
+            return jedis.zremrangeByRank(key, start, stop);
+        } finally {
+            jedis.close();
+        }
+    }
+
 
     public String lpop(String key) {
         Jedis jedis = pool.getResource();
