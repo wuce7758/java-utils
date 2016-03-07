@@ -13,7 +13,7 @@ public class CmdTest {
 
             String stdErr = echo.getStdErr();
             assertThat(succ).isTrue();
-//            assertThat(stdErr).isEmpty();
+            assertThat(stdErr).isEmpty();
 
             int exitValue = echo.getExitValue();
             assertThat(exitValue).isEqualTo(0);

@@ -17,7 +17,7 @@ public class StreamGobbler extends Thread {
     private InputStream is;
     private TYPE type;
     private String commandLine;
-    private String output;
+    private String output = "";
 
     public StreamGobbler(Logger log, String commandLine, InputStream is, TYPE type) {
         this.log = log;

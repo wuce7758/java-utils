@@ -58,7 +58,7 @@ public class Cmd {
     private void kill() {
         long cost = System.currentTimeMillis() - startMillis;
         costMillis = cost;
-        log.warn("{} exipred in {}s , kill it.", commandLine, cost / 1000.);
+        log.warn("{} expired in {}s , kill it.", commandLine, cost / 1000.);
         process.destroy();
     }
 
