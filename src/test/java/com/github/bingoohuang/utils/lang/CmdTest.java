@@ -1,6 +1,11 @@
 package com.github.bingoohuang.utils.lang;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
 import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
 
 import static com.google.common.truth.Truth.assertThat;
 
@@ -20,6 +25,27 @@ public class CmdTest {
 
             String stdOut = echo.getStdOut();
             assertThat(stdOut).isEqualTo("abc\n");
+        }
+    }
+
+    @Test
+    public void test2() throws IOException {
+        if (!Os.isWindows) {
+            File abcOut = new File("abc.out");
+            abcOut.delete();
+
+            Cmd echo = new Cmd("sh", "-c", "echo \"abc\" > abc.out");
+            boolean succ = echo.syncExec(1200);
+            assertThat(succ).isTrue();
+
+            String out = Files.toString(abcOut, Charsets.UTF_8);
+            assertThat(out).isEqualTo("abc\n");
+
+            Cmd cat = new Cmd("sh", "-c", "cat < abc.out");
+            succ = cat.syncExec(1000);
+            assertThat(succ).isTrue();
+            assertThat(cat.getStdOut()).isEqualTo("abc\n");
+            abcOut.delete();
         }
     }
 }
