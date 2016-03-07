@@ -149,7 +149,7 @@
         <dependency>
             <groupId>com.google.truth</groupId>
             <artifactId>truth</artifactId>
-            <version>0.27</version>
+            <version>0.28</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -212,7 +212,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <skip>false</skip>
+                    <skip>true</skip>
                     <show>public</show>
                     <charset>UTF-8</charset>
                     <encoding>UTF-8</encoding>
