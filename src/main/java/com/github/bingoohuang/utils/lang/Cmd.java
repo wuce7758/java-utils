@@ -13,7 +13,7 @@ public class Cmd {
     private Process process;
     private long startMillis;
     private boolean aliveFlag;
-    private int exitValue;
+    private int exitValue = Integer.MIN_VALUE;
 
     private StreamGobbler stdoutStreamGobbler;
     private StreamGobbler stderrStreamGobbler;
@@ -96,5 +96,13 @@ public class Cmd {
         } catch (IllegalThreadStateException e) {
             return true;
         }
+    }
+
+    public String getStdOut() {
+        return stdoutStreamGobbler.getOutput();
+    }
+
+    public String getStdErr() {
+        return stderrStreamGobbler.getOutput();
     }
 }

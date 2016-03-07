@@ -2,7 +2,6 @@ package com.github.bingoohuang.utils.crypto;
 
 import com.github.bingoohuang.utils.codec.Base64;
 import com.github.bingoohuang.utils.codec.Bytes;
-import com.sun.crypto.provider.AESCipher;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.Cipher;

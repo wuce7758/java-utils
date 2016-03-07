@@ -6,11 +6,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 
 public class StreamGobbler extends Thread {
-    public static enum TYPE { STDOUT, STDERR }
+    public enum TYPE { STDOUT, STDERR }
 
     private Logger log;
 
@@ -56,8 +55,8 @@ public class StreamGobbler extends Thread {
             log.error("{} ioexception {}", commandLine, e.getMessage());
         }
         finally {
-            IOUtils.closeQuietly(isr);
-            IOUtils.closeQuietly(br);
+            Closer.closeQuietly(isr);
+            Closer.closeQuietly(br);
         }
     }
 }
