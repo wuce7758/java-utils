@@ -8,7 +8,7 @@
     </parent>
     <groupId>com.github.bingoohuang</groupId>
     <artifactId>java-utils</artifactId>
-    <version>0.0.7-SNAPSHOT</version>
+    <version>0.0.7</version>
     <packaging>jar</packaging>
 
     <name>java utilities</name>
