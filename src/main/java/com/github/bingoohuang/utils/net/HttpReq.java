@@ -2,28 +2,26 @@ package com.github.bingoohuang.utils.net;
 
 import com.github.bingoohuang.utils.codec.Json;
 import com.google.common.collect.Lists;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.*;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.security.cert.X509Certificate;
 import java.util.List;
 
+@Slf4j
 public class HttpReq {
     private final String baseUrl;
     private String req;
     private StringBuilder params = new StringBuilder();
-    Logger logger = LoggerFactory.getLogger(HttpReq.class);
     private List<Pair<String, String>> props = Lists.newArrayList();
-    private SSLSocketFactory sslSocketFactory;
-    private HostnameVerifier hostnameVerifier;
     private String body;
     private String anchor;
 
@@ -78,31 +76,17 @@ public class HttpReq {
         return this;
     }
 
-    public HttpReq sslSocketFactory(SSLSocketFactory sslSocketFactory) {
-        this.sslSocketFactory = sslSocketFactory;
-        return this;
-    }
-
-    public HttpReq hostnameVerifier(HostnameVerifier hostnameVerifier) {
-        this.hostnameVerifier = hostnameVerifier;
-        return this;
-    }
-
     public String post() {
         HttpURLConnection http = null;
         try {
             String url = baseUrl + (req == null ? "" : req)
-                    + (params.length() > 0 && body != null? ("?" + params) : "")
+                    + (params.length() > 0 && body != null ? ("?" + params) : "")
                     + (anchor == null ? "" : "#" + anchor);
 
             http = commonSettings(url);
+
             setHeaders(http);
             postSettings(http);
-            if (sslSocketFactory != null)
-                ((HttpsURLConnection) http).setSSLSocketFactory(sslSocketFactory);
-
-            if (hostnameVerifier != null)
-                ((HttpsURLConnection) http).setHostnameVerifier(hostnameVerifier);
 
             // 连接，从postUrl.openConnection()至此的配置必须要在connect之前完成，
             // 要注意的是connection.getOutputStream会隐含的进行connect。
@@ -112,11 +96,39 @@ public class HttpReq {
 
             return parseResponse(http, url);
         } catch (Exception e) {
-            logger.error("post error {}", e.getMessage());
+            log.error("post error {}", e.getMessage());
             return null;
         } finally {
             if (http != null) http.disconnect();
         }
+    }
+
+    @SneakyThrows
+    private static void trustAllHosts() {
+        // Create a trust manager that does not validate certificate chains
+        val trustAllCerts = new TrustManager[]{new X509TrustManager() {
+            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                return new java.security.cert.X509Certificate[]{};
+            }
+
+            public void checkClientTrusted(X509Certificate[] chain, String authType)
+                    throws java.security.cert.CertificateException {
+            }
+
+            public void checkServerTrusted(X509Certificate[] chain, String authType)
+                    throws java.security.cert.CertificateException {
+            }
+        }};
+
+        // Install the all-trusting trust manager
+        SSLContext sc = SSLContext.getInstance("TLS"); // "TLS" "SSL"
+        sc.init(null, trustAllCerts, new java.security.SecureRandom());
+        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+        });
     }
 
     private void postSettings(HttpURLConnection http) throws ProtocolException {
@@ -143,17 +155,11 @@ public class HttpReq {
             http = commonSettings(url);
             setHeaders(http);
 
-            if (sslSocketFactory != null)
-                ((HttpsURLConnection) http).setSSLSocketFactory(sslSocketFactory);
-
-            if (hostnameVerifier != null)
-                ((HttpsURLConnection) http).setHostnameVerifier(hostnameVerifier);
-
             http.connect();
 
             return parseResponse(http, url);
         } catch (Exception e) {
-            logger.error("get error {}", e.getMessage());
+            log.error("get error {}", e.getMessage());
             return null;
         } finally {
             if (http != null) http.disconnect();
@@ -165,8 +171,13 @@ public class HttpReq {
             http.setRequestProperty(prop.getKey(), prop.getValue());
     }
 
-    private HttpURLConnection commonSettings(String url) throws IOException {
-        HttpURLConnection http = (HttpURLConnection) new URL(url).openConnection();
+    static {
+        trustAllHosts();
+    }
+
+    private HttpURLConnection commonSettings(String urlString) throws IOException {
+        URL url = new URL(urlString);
+        val http = (HttpURLConnection) url.openConnection();
         http.setRequestProperty("Accept-Charset", "UTF-8");
         HttpURLConnection.setFollowRedirects(true);
         http.setConnectTimeout(60 * 1000);
@@ -199,7 +210,7 @@ public class HttpReq {
 
         if (status == 200) return readResponseBody(http, charset);
 
-        logger.warn("non 200 response :" + readErrorResponseBody(url, http, status, charset));
+        log.warn("non 200 response :" + readErrorResponseBody(url, http, status, charset));
         return null;
     }
 
