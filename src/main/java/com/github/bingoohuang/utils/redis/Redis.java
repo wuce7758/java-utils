@@ -119,6 +119,26 @@ public class Redis {
         }
     }
 
+
+    public long decr(String key) {
+        Jedis jedis = pool.getResource();
+        try {
+            return jedis.decr(key);
+        } finally {
+            jedis.close();
+        }
+    }
+
+    public long decrBy(String key, long incrBy) {
+        Jedis jedis = pool.getResource();
+        try {
+            return jedis.decrBy(key, incrBy);
+        } finally {
+            jedis.close();
+        }
+    }
+
+
     public String hmset(String key, Map value) {
         Jedis jedis = pool.getResource();
         try {
